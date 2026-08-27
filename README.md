@@ -51,7 +51,7 @@ See `ROADMAP.md` for how these get addressed, and `CASE_STUDY.md` for the produc
 ## Running locally
 
 No installation needed — it's a static file:
-1. Download `cheap-flights-finder.html`
+1. Download `index.html`
 2. Double-click to open in any browser, or run a local server (`python3 -m http.server`) and visit `localhost:8000`
 
 ## License
