@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Farebox — Find cheap flights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#10131c;
+    --panel:#1a1f2e;
+    --panel-2:#222944;
+    --line:#2c3348;
+    --text:#e9e7df;
+    --text-dim:#8a90a3;
+    --amber:#ffb020;
+    --teal:#22d3b6;
+    --coral:#ff6857;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #1c2338 0%, transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, #1a2436 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Manrope', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--amber); color:#10131c;}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- Header ---------- */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 0; border-bottom:1px solid var(--line);
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-family:'Space Mono', monospace; font-weight:700; letter-spacing:0.5px; font-size:18px;}
+  .logo .dot{width:9px; height:9px; border-radius:50%; background:var(--amber); box-shadow:0 0 10px var(--amber);}
+  .top-note{font-size:12px; color:var(--text-dim); font-family:'Space Mono', monospace;}
+
+  /* ---------- Hero / board ---------- */
+  .hero{padding:56px 0 28px;}
+  .ready-fly{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'Space Mono', monospace; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    font-size:13px; color:var(--teal);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:8px 16px; margin-bottom:18px;
+  }
+  .ready-fly .plane{
+    display:inline-block; font-size:15px;
+    animation:takeoff 2.2s ease-in-out infinite;
+  }
+  @keyframes takeoff{
+    0%{transform:translate(0,0) rotate(0deg);}
+    50%{transform:translate(3px,-4px) rotate(-8deg);}
+    100%{transform:translate(0,0) rotate(0deg);}
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace; font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--teal); margin-bottom:14px;
+  }
+  h1{
+    font-family:'Space Mono', monospace; font-weight:700;
+    font-size:clamp(28px, 5vw, 46px); line-height:1.15; margin:0 0 28px; max-width:760px;
+  }
+  h1 span{color:var(--amber);}
+
+  .board{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow: 0 20px 60px -30px rgba(0,0,0,0.7);
+  }
+  .board-label{font-family:'Space Mono', monospace; font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:10px;}
+  .board-input-row{display:flex; gap:10px; flex-wrap:wrap;}
+  #query{
+    flex:1 1 380px;
+    background:#0c0f18;
+    border:1px solid var(--line);
+    border-radius:10px;
+    color:var(--amber);
+    font-family:'Space Mono', monospace;
+    font-size:16px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    padding:16px 16px;
+    min-width:220px;
+  }
+  #query::placeholder{color:#5c6280; text-transform:none;}
+  button#searchBtn{
+    background:var(--amber);
+    color:#10131c;
+    border:none;
+    border-radius:10px;
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    letter-spacing:1px;
+    font-size:14px;
+    text-transform:uppercase;
+    padding:16px 26px;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  button#searchBtn:hover{transform:translateY(-1px); box-shadow:0 8px 20px -8px rgba(255,176,32,0.5);}
+  button#searchBtn:active{transform:translateY(0);}
+
+  .board-preview{
+    margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);
+    font-family:'Space Mono', monospace; font-size:13px; color:var(--text-dim);
+    min-height:18px;
+  }
+  .board-preview b{color:var(--teal); font-weight:700;}
+
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px;}
+  .chip{
+    font-family:'Space Mono', monospace; font-size:12px; color:var(--text-dim);
+    border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer; background:transparent;
+  }
+  .chip:hover{border-color:var(--amber); color:var(--amber);}
+
+  /* ---------- Section headings ---------- */
+  .section{padding:44px 0;}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
+  .section-title{font-family:'Space Mono', monospace; font-weight:700; font-size:20px;}
+  .section-sub{font-size:13px; color:var(--text-dim);}
+
+  /* ---------- Ticket cards ---------- */
+  .top3{display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin-bottom:26px;}
+  @media (max-width:760px){.top3{grid-template-columns:1fr;}}
+
+  .ticket{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    overflow:hidden;
+  }
+  .ticket.rank1{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .ticket-rank{
+    position:absolute; top:0; right:0;
+    font-family:'Space Mono', monospace; font-size:11px; font-weight:700;
+    background:var(--panel-2); color:var(--text-dim);
+    padding:5px 10px; border-bottom-left-radius:10px;
+  }
+  .ticket.rank1 .ticket-rank{background:var(--amber); color:#10131c;}
+  .ticket-route{font-family:'Space Mono', monospace; font-size:15px; font-weight:700; letter-spacing:0.5px; margin-bottom:4px;}
+  .ticket-airline{font-size:13px; color:var(--text-dim); margin-bottom:14px;}
+  .lcc-tag{
+    display:inline-block; margin-left:8px; font-family:'Space Mono', monospace; font-size:10px;
+    color:var(--teal); border:1px solid var(--teal); border-radius:5px; padding:1px 6px; letter-spacing:0.5px;
+  }
+  .ticket-price{font-family:'Space Mono', monospace; font-size:26px; font-weight:700; color:var(--amber);}
+  .ticket-price small{font-size:12px; color:var(--text-dim); font-weight:400;}
+  .ticket-meta{display:flex; justify-content:space-between; margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); font-size:12px; color:var(--text-dim); font-family:'Space Mono', monospace;}
+
+  .full-list{display:flex; flex-direction:column; gap:8px;}
+  .row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 16px;
+    font-size:13px; flex-wrap:wrap;
+  }
+  .row .r-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .row .r-airline{font-weight:600;}
+  .row .r-price{font-family:'Space Mono', monospace; color:var(--amber); font-weight:700; font-size:15px;}
+
+  .empty, .loading{color:var(--text-dim); font-size:14px; font-family:'Space Mono', monospace;}
+
+  .actions-row{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;}
+  .btn-outline{
+    background:transparent; border:1px solid var(--line); color:var(--text);
+    font-family:'Space Mono', monospace; font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
+    padding:11px 18px; border-radius:9px; cursor:pointer; text-decoration:none; display:inline-block;
+  }
+  .btn-outline:hover{border-color:var(--teal); color:var(--teal);}
+  .btn-solid{
+    background:var(--teal); border:none; color:#0c1420; font-weight:700;
+    font-family:'Space Mono', monospace; font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
+    padding:11px 18px; border-radius:9px; cursor:pointer;
+  }
+  .btn-solid:hover{filter:brightness(1.08);}
+  .btn-solid:disabled{opacity:0.5; cursor:default;}
+
+  /* ---------- Itinerary ---------- */
+  .day{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:10px;
+  }
+  .day-head{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
+  .day-num{
+    font-family:'Space Mono', monospace; font-weight:700; font-size:13px; color:#10131c;
+    background:var(--teal); border-radius:6px; padding:3px 9px;
+  }
+  .day-title{font-weight:700; font-size:15px;}
+  .day-cost{margin-left:auto; font-family:'Space Mono', monospace; font-size:12px; color:var(--text-dim);}
+  .slot{display:flex; gap:12px; padding:8px 0; border-top:1px solid var(--line); font-size:13.5px;}
+  .slot:first-of-type{border-top:none;}
+  .slot-time{font-family:'Space Mono', monospace; color:var(--teal); min-width:78px; font-size:12px; padding-top:1px;}
+  .slot-text{color:var(--text); line-height:1.5;}
+
+  footer{border-top:1px solid var(--line); padding:26px 0 50px; font-size:12px; color:var(--text-dim); font-family:'Space Mono', monospace;}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important; animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="logo"><span class="dot"></span>FAREBOX</div>
+    <div class="top-note">PROTOTYPE · SAMPLE FARES</div>
+  </header>
+
+  <section class="hero">
+    <div class="ready-fly">Ready to Fly <span class="plane">✈️</span></div>
+    <div class="eyebrow">Cheap flights, in plain English</div>
+    <h1>Type where you want to go.<br>We'll find the <span>cheapest way</span> there.</h1>
+
+    <div class="board">
+      <div class="board-label">Search</div>
+      <div class="board-input-row">
+        <input id="query" type="text" placeholder='e.g. "find cheap flights to Thailand for 5 days"' autocomplete="off" />
+        <button id="searchBtn">Search</button>
+      </div>
+      <div class="board-preview" id="preview">Reading your search will appear here as you type…</div>
+      <div class="chips">
+        <button class="chip" data-q="find cheap flights to Thailand for 5 days">Thailand · 5 days</button>
+        <button class="chip" data-q="find cheap flights to Prague for 4 days">Prague · 4 days</button>
+        <button class="chip" data-q="find cheap flights to Vietnam for 6 days">Vietnam · 6 days</button>
+        <button class="chip" data-q="find cheap flights to Sri Lanka for 3 days">Sri Lanka · 3 days</button>
+        <button class="chip" data-q="find cheap flights to Bali for 7 days">Bali · 7 days</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="resultsSection" style="display:none;">
+    <div class="section-head">
+      <div>
+        <div class="section-title" id="resultsTitle">Results</div>
+        <div class="section-sub" id="resultsSub"></div>
+      </div>
+    </div>
+
+    <div class="top3" id="top3"></div>
+
+    <div class="section-head" style="margin-top:6px;">
+      <div class="section-title" style="font-size:15px;">All options</div>
+    </div>
+    <div class="full-list" id="fullList"></div>
+
+    <div class="actions-row">
+      <a class="btn-outline" id="skyscannerLink" href="#" target="_blank" rel="noopener">Compare on Skyscanner ↗</a>
+      <button class="btn-solid" id="itineraryBtn">Generate day-by-day itinerary</button>
+    </div>
+  </section>
+
+  <section class="section" id="itinerarySection" style="display:none;">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Suggested itinerary</div>
+        <div class="section-sub">Budget-first: free sights, walkable routes, local transport over taxis.</div>
+      </div>
+    </div>
+    <div id="itineraryBody"><div class="loading">…</div></div>
+  </section>
+
+  <footer>
+    Flight prices and itineraries shown are sample/template data for this free prototype — swap in a live Amadeus or Kiwi Tequila API key for real fares, and a backend-proxied AI call for live itineraries. Not affiliated with Skyscanner; the compare link uses their public search URL only.
+  </footer>
+</div>
+
+<script>
+// ---------------- Mock route data (INR, ex-Chennai/MAA) ----------------
+const ROUTES = {
+  thailand: {code:'BKK', label:'Bangkok, Thailand', base:13500, hrs:'4h 10m direct'},
+  vietnam: {code:'SGN', label:'Ho Chi Minh City, Vietnam', base:15200, hrs:'5h 30m · 1 stop'},
+  singapore: {code:'SIN', label:'Singapore', base:14800, hrs:'4h 20m direct'},
+  malaysia: {code:'KUL', label:'Kuala Lumpur, Malaysia', base:12900, hrs:'4h 30m direct'},
+  'sri lanka': {code:'CMB', label:'Colombo, Sri Lanka', base:8200, hrs:'1h 40m direct'},
+  bali: {code:'DPS', label:'Denpasar, Bali', base:19800, hrs:'6h 45m · 1 stop'},
+  indonesia: {code:'DPS', label:'Denpasar, Bali', base:19800, hrs:'6h 45m · 1 stop'},
+  dubai: {code:'DXB', label:'Dubai, UAE', base:11500, hrs:'4h 05m direct'},
+  nepal: {code:'KTM', label:'Kathmandu, Nepal', base:10800, hrs:'3h 20m · 1 stop'},
+  prague: {code:'PRG', label:'Prague, Czechia', base:36500, hrs:'11h 40m · 1 stop'},
+  budapest: {code:'BUD', label:'Budapest, Hungary', base:37200, hrs:'12h 05m · 1 stop'},
+  turkey: {code:'IST', label:'Istanbul, Turkey', base:24500, hrs:'6h 15m direct'},
+};
+
+const AIRLINES = [
+  {name:'IndiGo', lcc:true, mult:1.00},
+  {name:'AirAsia', lcc:true, mult:0.94},
+  {name:'Scoot', lcc:true, mult:1.05},
+  {name:'Thai AirAsia', lcc:true, mult:0.97},
+  {name:'Vietjet Air', lcc:true, mult:0.90},
+  {name:'Turkish Airlines', lcc:false, mult:1.35},
+  {name:'Singapore Airlines', lcc:false, mult:1.48},
+  {name:'Emirates', lcc:false, mult:1.42},
+  {name:'Qatar Airways', lcc:false, mult:1.38},
+  {name:'Sri Lankan Airlines', lcc:false, mult:1.15},
+];
+
+function findRoute(text){
+  const t = text.toLowerCase();
+  for(const key of Object.keys(ROUTES)){
+    if(t.includes(key)) return {key, ...ROUTES[key]};
+  }
+  return null;
+}
+function findDays(text){
+  const m = text.toLowerCase().match(/(\d+)\s*(day|days|night|nights)/);
+  return m ? parseInt(m[1]) : 5;
+}
+
+// ---------------- Live preview as user types ----------------
+const queryEl = document.getElementById('query');
+const previewEl = document.getElementById('preview');
+function updatePreview(){
+  const val = queryEl.value.trim();
+  if(!val){ previewEl.innerHTML = 'Reading your search will appear here as you type…'; return; }
+  const route = findRoute(val);
+  const days = findDays(val);
+  if(route){
+    previewEl.innerHTML = `→ <b>${route.code}</b> · ${days} day${days>1?'s':''} · from <b>MAA</b> (Chennai)`;
+  } else {
+    previewEl.innerHTML = `→ Destination not recognised yet — try Thailand, Vietnam, Singapore, Malaysia, Sri Lanka, Bali, Dubai, Nepal, Prague, Budapest or Turkey`;
+  }
+}
+queryEl.addEventListener('input', updatePreview);
+document.querySelectorAll('.chip').forEach(c=>{
+  c.addEventListener('click', ()=>{ queryEl.value = c.dataset.q; updatePreview(); runSearch(); });
+});
+
+// ---------------- Search + render results ----------------
+let currentRoute = null, currentDays = 5;
+
+function runSearch(){
+  const val = queryEl.value.trim();
+  if(!val){ queryEl.focus(); return; }
+  const route = findRoute(val);
+  const days = findDays(val);
+  if(!route){ updatePreview(); return; }
+  currentRoute = route; currentDays = days;
+
+  const seedShift = (route.code.charCodeAt(0) + days) % 7;
+  const results = AIRLINES.map((a,i)=>{
+    const jitter = ((i*13 + seedShift*7) % 9) * 55; // deterministic pseudo-variation
+    const price = Math.round((route.base * a.mult + jitter) / 10) * 10;
+    return {airline:a.name, lcc:a.lcc, price};
+  }).sort((a,b)=>a.price-b.price);
+
+  document.getElementById('resultsSection').style.display = 'block';
+  document.getElementById('itinerarySection').style.display = 'none';
+  document.getElementById('resultsTitle').textContent = `Chennai → ${route.label}`;
+  document.getElementById('resultsSub').textContent = `${route.hrs} · round trip, ${days} day${days>1?'s':''} on ground · sample fares in ₹`;
+
+  const top3 = results.slice(0,3);
+  document.getElementById('top3').innerHTML = top3.map((r,i)=>`
+    <div class="ticket ${i===0?'rank1':''}">
+      <div class="ticket-rank">${i===0?'CHEAPEST':'#'+(i+1)}</div>
+      <div class="ticket-route">MAA → ${route.code}</div>
+      <div class="ticket-airline">${r.airline}${r.lcc?'<span class="lcc-tag">LOW COST</span>':''}</div>
+      <div class="ticket-price">₹${r.price.toLocaleString('en-IN')} <small>round trip</small></div>
+      <div class="ticket-meta"><span>${route.hrs.split('·')[0].trim()}</span><span>per person</span></div>
+    </div>
+  `).join('');
+
+  document.getElementById('fullList').innerHTML = results.map(r=>`
+    <div class="row">
+      <div class="r-left">
+        <span class="r-airline">${r.airline}</span>
+        ${r.lcc?'<span class="lcc-tag">LOW COST</span>':''}
+      </div>
+      <div class="r-price">₹${r.price.toLocaleString('en-IN')}</div>
+    </div>
+  `).join('');
+
+  const today = new Date(); today.setDate(today.getDate()+30);
+  const dateStr = today.toISOString().slice(0,10);
+  document.getElementById('skyscannerLink').href = `https://www.skyscanner.net/transport/flights/maa/${route.code.toLowerCase()}/${dateStr.replace(/-/g,'').slice(2)}/`;
+
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+document.getElementById('searchBtn').addEventListener('click', runSearch);
+queryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
+
+// ---------------- Itinerary (free, static templates — no API/backend needed) ----------------
+const ITINERARIES = {
+  thailand: [
+    {title:'Old City temples on foot', est_cost_inr:900, slots:[{time:'Morning',text:'Walk the Grand Palace and Wat Pho, both free to admire from outside, small entry fee inside.'},{time:'Afternoon',text:'River ferry along the Chao Phraya instead of a taxi.'},{time:'Evening',text:'Street-food dinner at a night market, all under 150 rupees.'}]},
+    {title:'Chatuchak and local transit', est_cost_inr:700, slots:[{time:'Morning',text:'BTS Skytrain to Chatuchak Weekend Market, cheap tickets, huge browse-for-free market.'},{time:'Afternoon',text:'Lunch at a market food stall.'},{time:'Evening',text:'Free sunset views from Golden Mount, small donation entry.'}]},
+    {title:'Day trip, budget style', est_cost_inr:1200, slots:[{time:'Morning',text:'Shared minivan to Ayutthaya ruins, cheaper than a private tour.'},{time:'Afternoon',text:'Wander the free-to-view temple ruins at your own pace.'},{time:'Evening',text:'Return by train, dinner near your hostel.'}]},
+    {title:'Markets and canals', est_cost_inr:850, slots:[{time:'Morning',text:'Local bus to a floating market, cheaper than tour packages.'},{time:'Afternoon',text:'Walk Chinatown for cheap street eats.'},{time:'Evening',text:'Free public park or riverside walk to wind down.'}]},
+    {title:'Museums and parks', est_cost_inr:600, slots:[{time:'Morning',text:'Lumphini Park, free, good for a slow morning.'},{time:'Afternoon',text:'Low-cost local museum or gallery.'},{time:'Evening',text:'Free viewpoint, then cheap noodle dinner.'}]},
+    {title:'Slow day, hostel neighborhood', est_cost_inr:500, slots:[{time:'Morning',text:'Explore your hostel neighborhood on foot.'},{time:'Afternoon',text:'Rest, laundry, plan next leg if traveling onward.'},{time:'Evening',text:'Favorite street stall revisit.'}]},
+  ],
+  vietnam: [
+    {title:'Old Quarter on foot', est_cost_inr:800, slots:[{time:'Morning',text:'Walk the Old Quarter, free, dense with sights.'},{time:'Afternoon',text:'Street-side pho and banh mi lunch.'},{time:'Evening',text:'Egg coffee at a local cafe, budget-friendly.'}]},
+    {title:'History, free and low-cost sites', est_cost_inr:600, slots:[{time:'Morning',text:'Low-entry-fee history museum.'},{time:'Afternoon',text:'Walk or cycle-rickshaw along the river.'},{time:'Evening',text:'Night market street food.'}]},
+    {title:'Local bus day trip', est_cost_inr:1000, slots:[{time:'Morning',text:'Public bus to nearby countryside or delta.'},{time:'Afternoon',text:'Boat ride, shared and budget, through canals.'},{time:'Evening',text:'Return, simple dinner near lodging.'}]},
+    {title:'Markets and lakes', est_cost_inr:650, slots:[{time:'Morning',text:'Walk around a central lake, free.'},{time:'Afternoon',text:'Browse a local market, no obligation to buy.'},{time:'Evening',text:'Cheap local beer street corner.'}]},
+    {title:'Temples and parks', est_cost_inr:550, slots:[{time:'Morning',text:'Free-entry pagoda visit.'},{time:'Afternoon',text:'City park, people-watch.'},{time:'Evening',text:'Street barbecue dinner.'}]},
+    {title:'Slow day', est_cost_inr:450, slots:[{time:'Morning',text:'Cafe morning, journal or plan.'},{time:'Afternoon',text:'Neighborhood walk.'},{time:'Evening',text:'Revisit a favorite food stall.'}]},
+  ],
+  singapore: [
+    {title:'Free gardens and waterfront', est_cost_inr:1200, slots:[{time:'Morning',text:'Gardens by the Bay outdoor gardens, free entry, domes cost extra so skip them.'},{time:'Afternoon',text:'Walk the Marina Bay waterfront, free.'},{time:'Evening',text:'Hawker centre dinner, genuinely cheap and great food.'}]},
+    {title:'Neighborhoods on foot and MRT', est_cost_inr:900, slots:[{time:'Morning',text:'MRT to Chinatown, walk the streets.'},{time:'Afternoon',text:'Little India on foot.'},{time:'Evening',text:'Hawker centre again, best value meal in the city.'}]},
+    {title:'Nature, mostly free', est_cost_inr:700, slots:[{time:'Morning',text:'MacRitchie Reservoir or a free nature trail.'},{time:'Afternoon',text:'Pack a cheap hawker lunch to go.'},{time:'Evening',text:'Free light show at Marina Bay Sands, viewed from outside.'}]},
+    {title:'Museums and parks', est_cost_inr:800, slots:[{time:'Morning',text:'Check for free-entry museum days.'},{time:'Afternoon',text:'East Coast Park, free, bike rental optional.'},{time:'Evening',text:'Hawker dinner near the park.'}]},
+    {title:'Slow local day', est_cost_inr:600, slots:[{time:'Morning',text:'Explore Tiong Bahru on foot.'},{time:'Afternoon',text:'Cafe, plan next leg.'},{time:'Evening',text:'Favorite hawker stall revisit.'}]},
+  ],
+  malaysia: [
+    {title:'Petronas and free city walk', est_cost_inr:900, slots:[{time:'Morning',text:'KLCC Park, free, great Petronas Towers views.'},{time:'Afternoon',text:'Walk Bukit Bintang.'},{time:'Evening',text:'Jalan Alor street food.'}]},
+    {title:'Batu Caves and transit', est_cost_inr:600, slots:[{time:'Morning',text:'Train to Batu Caves, cheap, free entry to main cave.'},{time:'Afternoon',text:'Return, explore Chinatown.'},{time:'Evening',text:'Hawker stall dinner.'}]},
+    {title:'Old town heritage', est_cost_inr:700, slots:[{time:'Morning',text:'Merdeka Square area, free to walk.'},{time:'Afternoon',text:'Central Market browsing.'},{time:'Evening',text:'Cheap local mamak dinner.'}]},
+    {title:'Parks and museums', est_cost_inr:650, slots:[{time:'Morning',text:'Perdana Botanical Gardens, low entry fee.'},{time:'Afternoon',text:'Low-cost local museum.'},{time:'Evening',text:'Street food revisit.'}]},
+    {title:'Slow day', est_cost_inr:500, slots:[{time:'Morning',text:'Neighborhood cafe morning.'},{time:'Afternoon',text:'Rest and plan.'},{time:'Evening',text:'Favorite food stall.'}]},
+  ],
+  'sri lanka': [
+    {title:'Colombo on foot and bus', est_cost_inr:700, slots:[{time:'Morning',text:'Galle Face Green, free waterfront walk.'},{time:'Afternoon',text:'Pettah Market browsing.'},{time:'Evening',text:'Street food, kottu roti.'}]},
+    {title:'Trains and temples', est_cost_inr:600, slots:[{time:'Morning',text:'Scenic local train, very cheap.'},{time:'Afternoon',text:'Low-entry-fee temple visit.'},{time:'Evening',text:'Local rice-and-curry dinner.'}]},
+    {title:'Coastal day', est_cost_inr:800, slots:[{time:'Morning',text:'Public bus to a nearby beach town.'},{time:'Afternoon',text:'Free beach time.'},{time:'Evening',text:'Seafood street stall.'}]},
+    {title:'Slow day', est_cost_inr:450, slots:[{time:'Morning',text:'Neighborhood walk.'},{time:'Afternoon',text:'Cafe, rest.'},{time:'Evening',text:'Favorite local eatery.'}]},
+  ],
+  bali: [
+    {title:'Rice terraces and free viewpoints', est_cost_inr:1000, slots:[{time:'Morning',text:'Scooter or shared van to Tegalalang rice terrace, small donation entry.'},{time:'Afternoon',text:'Free waterfall hike nearby.'},{time:'Evening',text:'Warung, local eatery, dinner, cheap and good.'}]},
+    {title:'Temples on a budget', est_cost_inr:800, slots:[{time:'Morning',text:'Low-entry-fee temple visit, sarong often included.'},{time:'Afternoon',text:'Walk a local village.'},{time:'Evening',text:'Warung dinner near your stay.'}]},
+    {title:'Beach day', est_cost_inr:500, slots:[{time:'Morning',text:'Free public beach.'},{time:'Afternoon',text:'Beachside warung lunch.'},{time:'Evening',text:'Sunset watch, free.'}]},
+    {title:'Local markets', est_cost_inr:700, slots:[{time:'Morning',text:'Ubud morning market walk.'},{time:'Afternoon',text:'Art village browsing, no obligation to buy.'},{time:'Evening',text:'Warung dinner.'}]},
+    {title:'Nature day', est_cost_inr:900, slots:[{time:'Morning',text:'Free or low-cost jungle trek.'},{time:'Afternoon',text:'River swim spot.'},{time:'Evening',text:'Local dinner.'}]},
+    {title:'Slow day', est_cost_inr:500, slots:[{time:'Morning',text:'Cafe morning.'},{time:'Afternoon',text:'Rest, plan.'},{time:'Evening',text:'Favorite warung revisit.'}]},
+    {title:'Coastal cliffs, free', est_cost_inr:600, slots:[{time:'Morning',text:'Cliffside walk, many are free public access.'},{time:'Afternoon',text:'Local lunch spot.'},{time:'Evening',text:'Sunset, then warung dinner.'}]},
+  ],
+  dubai: [
+    {title:'Free waterfront and old Dubai', est_cost_inr:1500, slots:[{time:'Morning',text:'Dubai Creek abra, traditional boat ride, a few dirhams.'},{time:'Afternoon',text:'Al Fahidi historic district, free to walk.'},{time:'Evening',text:'Free Dubai Fountain show at the Burj Khalifa base.'}]},
+    {title:'Souks and metro', est_cost_inr:1200, slots:[{time:'Morning',text:'Gold and Spice Souk browsing, free, no obligation to buy.'},{time:'Afternoon',text:'Metro to Jumeirah, walk the free public beach.'},{time:'Evening',text:'Budget shawarma dinner.'}]},
+    {title:'Desert and parks', est_cost_inr:1800, slots:[{time:'Morning',text:'Shared desert safari, cheaper than private.'},{time:'Afternoon',text:'Free public park rest.'},{time:'Evening',text:'Local eatery dinner.'}]},
+    {title:'Slow day', est_cost_inr:800, slots:[{time:'Morning',text:'Neighborhood walk.'},{time:'Afternoon',text:'Mall window-browsing, free air conditioning break.'},{time:'Evening',text:'Budget dinner near stay.'}]},
+  ],
+  nepal: [
+    {title:'Kathmandu on foot', est_cost_inr:600, slots:[{time:'Morning',text:'Durbar Square, low entry fee, walkable.'},{time:'Afternoon',text:'Thamel district browsing, free.'},{time:'Evening',text:'Local dal bhat dinner, cheap and filling.'}]},
+    {title:'Stupas and hills', est_cost_inr:500, slots:[{time:'Morning',text:'Swayambhunath, the Monkey Temple, small entry fee.'},{time:'Afternoon',text:'Walk to a nearby viewpoint.'},{time:'Evening',text:'Local dinner near lodging.'}]},
+    {title:'Slow, budget day', est_cost_inr:400, slots:[{time:'Morning',text:'Cafe morning, mountain views.'},{time:'Afternoon',text:'Rest, plan next leg if trekking.'},{time:'Evening',text:'Favorite local eatery.'}]},
+  ],
+  prague: [
+    {title:'Old Town on foot', est_cost_inr:1500, slots:[{time:'Morning',text:'Walk Old Town Square and Charles Bridge, both free.'},{time:'Afternoon',text:'Prague Castle grounds, free to walk, some buildings charge.'},{time:'Evening',text:'Budget Czech pub dinner, goulash, cheap beer.'}]},
+    {title:'Free walking tour and parks', est_cost_inr:900, slots:[{time:'Morning',text:'Free, tip-based, walking tour, a great way to orient.'},{time:'Afternoon',text:'Letna Park, free views over the city.'},{time:'Evening',text:'Local bistro dinner.'}]},
+    {title:'Trams and neighborhoods', est_cost_inr:1000, slots:[{time:'Morning',text:'Cheap tram day pass, explore beyond center.'},{time:'Afternoon',text:'Vysehrad fortress, free grounds.'},{time:'Evening',text:'Budget dinner.'}]},
+    {title:'Slow day', est_cost_inr:700, slots:[{time:'Morning',text:'Cafe morning.'},{time:'Afternoon',text:'Neighborhood walk.'},{time:'Evening',text:'Local pub revisit.'}]},
+  ],
+  budapest: [
+    {title:'Free ruins and river walk', est_cost_inr:1400, slots:[{time:'Morning',text:'Walk the Danube riverside, free.'},{time:'Afternoon',text:'Free entry to walk Buda Castle grounds.'},{time:'Evening',text:'Budget goulash dinner.'}]},
+    {title:'Thermal baths, budget option', est_cost_inr:1600, slots:[{time:'Morning',text:'Lower-cost public thermal bath session.'},{time:'Afternoon',text:'Walk Fisherman Bastion, free.'},{time:'Evening',text:'Local dinner.'}]},
+    {title:'Markets and parks', est_cost_inr:900, slots:[{time:'Morning',text:'Great Market Hall browsing.'},{time:'Afternoon',text:'City Park, free.'},{time:'Evening',text:'Cheap local bistro.'}]},
+    {title:'Slow day', est_cost_inr:700, slots:[{time:'Morning',text:'Cafe morning.'},{time:'Afternoon',text:'Neighborhood walk.'},{time:'Evening',text:'Favorite spot revisit.'}]},
+  ],
+  turkey: [
+    {title:'Old city, mostly free', est_cost_inr:1000, slots:[{time:'Morning',text:'Blue Mosque and Hagia Sophia exteriors, free to view, low entry inside.'},{time:'Afternoon',text:'Walk the Grand Bazaar, free browsing.'},{time:'Evening',text:'Budget kebab dinner.'}]},
+    {title:'Ferries and views', est_cost_inr:800, slots:[{time:'Morning',text:'Cheap public ferry across the Bosphorus.'},{time:'Afternoon',text:'Free walk through a local neighborhood.'},{time:'Evening',text:'Street food dinner.'}]},
+    {title:'Parks and markets', est_cost_inr:700, slots:[{time:'Morning',text:'Gulhane Park, free.'},{time:'Afternoon',text:'Spice Bazaar browsing.'},{time:'Evening',text:'Local eatery dinner.'}]},
+    {title:'Slow day', est_cost_inr:600, slots:[{time:'Morning',text:'Cafe morning.'},{time:'Afternoon',text:'Neighborhood walk.'},{time:'Evening',text:'Favorite kebab stall revisit.'}]},
+  ],
+};
+ITINERARIES.indonesia = ITINERARIES.bali;
+
+document.getElementById('itineraryBtn').addEventListener('click', ()=>{
+  if(!currentRoute) return;
+  const section = document.getElementById('itinerarySection');
+  const body = document.getElementById('itineraryBody');
+  section.style.display = 'block';
+  section.scrollIntoView({behavior:'smooth', block:'start'});
+
+  const pool = ITINERARIES[currentRoute.key] || [];
+  if(!pool.length){
+    body.innerHTML = '<div class="loading">No itinerary template available for this destination yet.</div>';
+    return;
+  }
+  const days = [];
+  for(let i=0;i<currentDays;i++){
+    days.push(pool[i % pool.length]);
+  }
+  renderItinerary(days);
+});
+
+function renderItinerary(days){
+  const body = document.getElementById('itineraryBody');
+  if(!days.length){ body.innerHTML = '<div class="loading">No itinerary returned — try again.</div>'; return; }
+  body.innerHTML = days.map((d,i)=>`
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">DAY ${i+1}</span>
+        <span class="day-title">${d.title || ''}</span>
+        ${d.est_cost_inr ? `<span class="day-cost">~₹${Number(d.est_cost_inr).toLocaleString('en-IN')}</span>` : ''}
+      </div>
+      ${(d.slots||[]).map(s=>`
+        <div class="slot">
+          <div class="slot-time">${s.time || ''}</div>
+          <div class="slot-text">${s.text || ''}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
